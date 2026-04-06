@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aqua Pulse | Create Account</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-page">
+    <main class="auth-shell">
+        <section class="auth-hero">
+            <div class="logo-badge" aria-hidden="true">
+                <svg viewBox="0 0 64 64" role="img">
+                    <defs>
+                        <linearGradient id="waveFillTwo" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#72d9ff"></stop>
+                            <stop offset="100%" stop-color="#48c8a9"></stop>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="32" cy="32" r="28" fill="#e8f9ff"></circle>
+                    <path d="M11 37 C17 29, 25 30, 31 35 C38 41, 46 41, 53 33 L53 45 L11 45 Z" fill="url(#waveFillTwo)"></path>
+                    <path d="M12 28 C18 21, 24 21, 31 26 C38 31, 45 31, 52 23" fill="none" stroke="#0d89bf" stroke-width="3.4" stroke-linecap="round"></path>
+                </svg>
+            </div>
+            <h1>Aqua Pulse</h1>
+            <p>Create your account to join the marine safety network.</p>
+        </section>
+
+        <section class="panel auth-card auth-card-light">
+            <h2>Create Account</h2>
+            <p>New users must complete registration before they can sign in.</p>
+
+            <div class="auth-form">
+                <input type="text" id="name" placeholder="Full Name">
+                <input type="text" id="username" placeholder="Username">
+                <input type="number" id="age" placeholder="Age" min="18" max="100">
+                <input type="tel" id="phone" placeholder="Phone Number (10 digits)" maxlength="10">
+                <select id="occupation">
+                    <option value="">Select Occupation</option>
+                    <option value="Fisherman">Fisherman</option>
+                    <option value="Lifeguard">Lifeguard</option>
+                    <option value="Marine Engineer">Marine Engineer</option>
+                    <option value="Marine Biologist">Marine Biologist</option>
+                    <option value="Cargo/Oil Ship Worker">Cargo/Oil Ship Worker</option>
+                    <option value="Beach Cleaner">Beach Cleaner</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="email" id="email" placeholder="Email">
+                <input type="password" id="password" placeholder="Password">
+                <input type="password" id="confirmPassword" placeholder="Confirm Password">
+                <button class="btn-primary" onclick="createAccount()">Create Account</button>
+            </div>
+
+            <div class="auth-footer">
+                <span>Already registered?</span>
+                <a class="link-button" href="login.html">Back to sign in</a>
+            </div>
+        </section>
+    </main>
+
+
+   <script type="module" src="signup.js"></script>
+</body>
+</html>
