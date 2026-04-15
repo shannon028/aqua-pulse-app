@@ -875,6 +875,52 @@ window.submitReport = async function () {
   const lng = Number.parseFloat(document.getElementById("longitude").value);
   const reportedAt = document.getElementById("reportedAt").value || new Date().toLocaleString();
   const file = document.getElementById("mediaFile").files[0];
+    let uploadedMediaUrl = "";
+  let mediaType = "";
+    if (file) {
+    mediaType = file.type;
+    // This converts the image so it can be sent to the database
+    uploadedMediaUrl = await fileToDataUrl(file); 
+  }
+
+  const finalHazard = hazardType === "Other" ? otherHazard : hazardType;
+
+  // 3. SEND THE DATA (Update the body with imageUrl and mediaType)
+  await fetch(`${API_BASE}/reports`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: currentUser.uid,
+      username: currentUserData?.username || "user",
+      type: finalHazard,
+      description,
+      severity,
+      latitude: lat,
+      longitude: lng,
+      areaName: manualLocation || "Not specified",
+      aiVerification: "true",
+      authorityStatus: "pending",
+      votesUp: 0,
+      votesDown: 0,
+      comments: [],
+      imageUrl: uploadedMediaUrl, // Updated this
+      mediaType: mediaType,      // Updated this
+      reportedAt
+    })
+  });
+
+  // 4. Finish up
+  await updateDoc(doc(db, "users", currentUser.uid), { points: increment(10) });
+  alert("Report submitted. +10 points added.");
+  
+  // Reset UI
+  reportVerified = false;
+  submitReportBtn.disabled = true;
+  verifyResultEl.textContent = "Awaiting verification";
+  verifyResultEl.className = "pill";
+  document.getElementById("reportForm").reset();
+  await loadReports();
+};
   const wordCount = description.split(/\s+/).filter(Boolean).length;
 
   if (!hazardType || !severity || !description || wordCount > 300 || wordCount < 12) {
