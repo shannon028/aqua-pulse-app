@@ -703,7 +703,7 @@ function renderReportsFeed() {
     const comments = Array.isArray(r.comments) ? r.comments : [];
     const status = (r.authorityStatus || "pending").toLowerCase();
     
-    // Updated logic to show images
+    // Logic to handle images/videos
     let mediaHtml = `<div class="feed-image feed-image-fallback">No image/video provided</div>`;
     
     if (r.imageUrl && r.imageUrl.trim() !== "") {
