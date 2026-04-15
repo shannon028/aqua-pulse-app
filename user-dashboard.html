@@ -702,43 +702,13 @@ function renderReportsFeed() {
     const r = item.data;
     const comments = Array.isArray(r.comments) ? r.comments : [];
     const status = (r.authorityStatus || "pending").toLowerCase();
-    
-    // Logic to handle images/videos
     let mediaHtml = `<div class="feed-image feed-image-fallback">No image/video provided</div>`;
-    
-    if (r.imageUrl && r.imageUrl.trim() !== "") {
-      if (r.mediaType?.startsWith("video/")) {
-        mediaHtml = `<video class="feed-image" controls src="${sanitizeText(r.imageUrl)}"></video>`;
-      } else {
-        mediaHtml = `<img class="feed-image" src="${sanitizeText(r.imageUrl)}" alt="Hazard image" style="display: block;">`;
-      }
+    if (r.mediaType?.startsWith("video/") && r.imageUrl) {
+      mediaHtml = `<video class="feed-image" controls src="${sanitizeText(r.imageUrl)}"></video>`;
+    } else if (r.imageUrl) {
+      mediaHtml = `<img class="feed-image" src="${sanitizeText(r.imageUrl)}" alt="Hazard image">`;
     }
 
-    return `
-      <article class="feed-card">
-        <div class="feed-head">
-          <strong>${sanitizeText(r.type || "Unspecified hazard")}</strong>
-          <span class="status-chip status-${status}">${status.replace("_", " ")}</span>
-        </div>
-        ${mediaHtml}
-        <p>${sanitizeText(r.description || "No description")}</p>
-        <p class="feed-meta">AI: ${sanitizeText(r.aiVerification || "pending")} | Admin: ${sanitizeText(r.adminConfirmation || "pending")} | Posted: ${sanitizeText(formatDate(r.reportedAt || r.createdAt))}</p>
-        <div class="vote-row">
-          <button class="btn-ghost" onclick="voteReport('${item.id}','up')">Thumbs Up ${r.votesUp || 0}</button>
-          <button class="btn-ghost" onclick="voteReport('${item.id}','down')">Thumbs Down ${r.votesDown || 0}</button>
-          <span class="auth-poll">Authority poll: ${status}</span>
-        </div>
-        <div class="comment-list">
-          ${comments.slice(-3).map((c) => `<p><b>${sanitizeText(c.by || "User")}:</b> ${sanitizeText(c.text || "")}</p>`).join("")}
-        </div>
-        <div class="comment-row">
-          <input id="comment-${item.id}" type="text" placeholder="Add comment">
-          <button class="btn-secondary" onclick="commentOnReport('${item.id}')">Comment</button>
-        </div>
-      </article>
-    `;
-  }).join("");
-}
     return `
       <article class="feed-card">
         <div class="feed-head">
@@ -874,52 +844,6 @@ window.submitReport = async function () {
   const lng = Number.parseFloat(document.getElementById("longitude").value);
   const reportedAt = document.getElementById("reportedAt").value || new Date().toLocaleString();
   const file = document.getElementById("mediaFile").files[0];
-    let uploadedMediaUrl = "";
-  let mediaType = "";
-    if (file) {
-    mediaType = file.type;
-    // This converts the image so it can be sent to the database
-    uploadedMediaUrl = await fileToDataUrl(file); 
-  }
-
-  const finalHazard = hazardType === "Other" ? otherHazard : hazardType;
-
-  // 3. SEND THE DATA (Update the body with imageUrl and mediaType)
-  await fetch(`${API_BASE}/reports`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      userId: currentUser.uid,
-      username: currentUserData?.username || "user",
-      type: finalHazard,
-      description,
-      severity,
-      latitude: lat,
-      longitude: lng,
-      areaName: manualLocation || "Not specified",
-      aiVerification: "true",
-      authorityStatus: "pending",
-      votesUp: 0,
-      votesDown: 0,
-      comments: [],
-      imageUrl: uploadedMediaUrl, // Updated this
-      mediaType: mediaType,      // Updated this
-      reportedAt
-    })
-  });
-
-  // 4. Finish up
-  await updateDoc(doc(db, "users", currentUser.uid), { points: increment(10) });
-  alert("Report submitted. +10 points added.");
-  
-  // Reset UI
-  reportVerified = false;
-  submitReportBtn.disabled = true;
-  verifyResultEl.textContent = "Awaiting verification";
-  verifyResultEl.className = "pill";
-  document.getElementById("reportForm").reset();
-  await loadReports();
-};
   const wordCount = description.split(/\s+/).filter(Boolean).length;
 
   if (!hazardType || !severity || !description || wordCount > 300 || wordCount < 12) {
