@@ -702,13 +702,44 @@ function renderReportsFeed() {
     const r = item.data;
     const comments = Array.isArray(r.comments) ? r.comments : [];
     const status = (r.authorityStatus || "pending").toLowerCase();
+    
+    // This is the section you updated
     let mediaHtml = `<div class="feed-image feed-image-fallback">No image/video provided</div>`;
-    if (r.mediaType?.startsWith("video/") && r.imageUrl) {
-      mediaHtml = `<video class="feed-image" controls src="${sanitizeText(r.imageUrl)}"></video>`;
-    } else if (r.imageUrl) {
-      mediaHtml = `<img class="feed-image" src="${sanitizeText(r.imageUrl)}" alt="Hazard image">`;
+    
+    if (r.imageUrl && r.imageUrl.trim() !== "") {
+      if (r.mediaType?.startsWith("video/")) {
+        mediaHtml = `<video class="feed-image" controls src="${sanitizeText(r.imageUrl)}"></video>`;
+      } else {
+        mediaHtml = `<img class="feed-image" src="${sanitizeText(r.imageUrl)}" alt="Hazard image" style="display: block;">`;
+      }
     }
 
+    // Keep the rest of your original return statement below
+    return `
+      <article class="feed-card">
+        <div class="feed-head">
+          <strong>${sanitizeText(r.type || "Unspecified hazard")}</strong>
+          <span class="status-chip status-${status}">${status.replace("_", " ")}</span>
+        </div>
+        ${mediaHtml}
+        <p>${sanitizeText(r.description || "No description")}</p>
+        <p class="feed-meta">AI: ${sanitizeText(r.aiVerification || "pending")} | Admin: ${sanitizeText(r.adminConfirmation || "pending")} | Posted: ${sanitizeText(formatDate(r.reportedAt || r.createdAt))}</p>
+        <div class="vote-row">
+          <button class="btn-ghost" onclick="voteReport('${item.id}','up')">Thumbs Up ${r.votesUp || 0}</button>
+          <button class="btn-ghost" onclick="voteReport('${item.id}','down')">Thumbs Down ${r.votesDown || 0}</button>
+          <span class="auth-poll">Authority poll: ${status}</span>
+        </div>
+        <div class="comment-list">
+          ${comments.slice(-3).map((c) => `<p><b>${sanitizeText(c.by || "User")}:</b> ${sanitizeText(c.text || "")}</p>`).join("")}
+        </div>
+        <div class="comment-row">
+          <input id="comment-${item.id}" type="text" placeholder="Add comment">
+          <button class="btn-secondary" onclick="commentOnReport('${item.id}')">Comment</button>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
     return `
       <article class="feed-card">
         <div class="feed-head">
