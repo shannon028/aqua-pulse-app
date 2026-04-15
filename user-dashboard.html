@@ -703,7 +703,7 @@ function renderReportsFeed() {
     const comments = Array.isArray(r.comments) ? r.comments : [];
     const status = (r.authorityStatus || "pending").toLowerCase();
     
-    // This is the section you updated
+    // Updated logic to show images
     let mediaHtml = `<div class="feed-image feed-image-fallback">No image/video provided</div>`;
     
     if (r.imageUrl && r.imageUrl.trim() !== "") {
@@ -714,7 +714,6 @@ function renderReportsFeed() {
       }
     }
 
-    // Keep the rest of your original return statement below
     return `
       <article class="feed-card">
         <div class="feed-head">
